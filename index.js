@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const { query } = require('express');
 require('dotenv').config();
 const ObjectId = require('mongodb').ObjectId;
 const app = express();
@@ -34,13 +35,30 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const item = await itemCollection.findOne(query);
             res.send(item);
+        });
+        // update delivered item quantity 
+        app.put('/item/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const item = await itemCollection.findOne(filter);
+            const newQuantity = parseInt(item.quantity) - 1;
+            const newSold = parseInt(item.sold) + 1;
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    quantity: newQuantity,
+                    sold: newSold
+                },
+            };
+            const result = await itemCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
         })
     }
     finally {
         // await client.close();
     }
 }
-run().catch(console.dir());
+run().catch(console.dir);
 app.listen(port, () => {
     console.log('server is running on port', port);
 })
