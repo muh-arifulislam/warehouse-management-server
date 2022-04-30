@@ -18,6 +18,15 @@ app.get('/', (req, res) => {
 async function run() {
     try {
         await client.connect();
+        const itemCollection = client.db('wareHouse').collection('item');
+
+        // get all item 
+        app.get('/item', async (req, res) => {
+            const query = {};
+            const cursor = itemCollection.find(query);
+            const items = await cursor.toArray();
+            res.send(items);
+        })
     }
     finally {
         // await client.close();
