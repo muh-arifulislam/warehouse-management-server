@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
+const ObjectId = require('mongodb').ObjectId;
 const app = express();
 const port = process.env.PORT || 5000;
 // midleware 
@@ -26,6 +27,13 @@ async function run() {
             const cursor = itemCollection.find(query);
             const items = await cursor.toArray();
             res.send(items);
+        });
+        // get signle item 
+        app.get('/item/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const item = await itemCollection.findOne(query);
+            res.send(item);
         })
     }
     finally {
