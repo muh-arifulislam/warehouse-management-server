@@ -22,12 +22,28 @@ async function run() {
         await client.connect();
         const itemCollection = client.db('wareHouse').collection('item');
 
-        // get all item 
+        // 
         app.get('/item', async (req, res) => {
-            const query = {};
-            const cursor = itemCollection.find(query);
-            const items = await cursor.toArray();
-            res.send(items);
+            if (req.query.email) {
+                const email = req.query.email;
+                const filter = { email };
+                const cursor = itemCollection.find(filter);
+                const items = await cursor.toArray();
+                res.send(items);
+            }
+            else if (req.query.showItem) {
+                const showItem = parseInt(req.query.showItem);
+                const query = {};
+                const cursor = itemCollection.find(query);
+                const items = await cursor.limit(showItem).toArray();
+                res.send(items);
+            }
+            else {
+                const query = {};
+                const cursor = itemCollection.find(query);
+                const items = await cursor.toArray();
+                res.send(items);
+            }
         });
         // get signle item 
         app.get('/item/:id', async (req, res) => {
@@ -57,6 +73,12 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await itemCollection.deleteOne(query);
+            res.send(result);
+        })
+        // add new item 
+        app.post('/item', async (req, res) => {
+            const newItem = req.body;
+            const result = await itemCollection.insertOne(newItem);
             res.send(result);
         })
     }
