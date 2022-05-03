@@ -21,6 +21,7 @@ async function run() {
     try {
         await client.connect();
         const itemCollection = client.db('wareHouse').collection('item');
+        const messageCollection = client.db('wareHouse').collection('message');
 
         // 
         app.get('/item', async (req, res) => {
@@ -79,6 +80,12 @@ async function run() {
         app.post('/item', async (req, res) => {
             const newItem = req.body;
             const result = await itemCollection.insertOne(newItem);
+            res.send(result);
+        })
+        //post message
+        app.post('/message', async (req, res) => {
+            const newMessage = req.body;
+            const result = await messageCollection.insertOne(newMessage);
             res.send(result);
         })
     }
