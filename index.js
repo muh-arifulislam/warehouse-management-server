@@ -88,6 +88,20 @@ async function run() {
             const result = await messageCollection.insertOne(newMessage);
             res.send(result);
         })
+        // get service count for countup 
+        app.get('/total-item', async (req, res) => {
+            let totalItem = 0;
+            let totalSold = 0;
+            const query = {}
+            const cursor = itemCollection.find(query);
+            const items = await cursor.toArray();
+            items.map(item => {
+                totalItem += parseInt(item.quantity);
+                totalSold += parseInt(item.sold);
+            });
+            res.send({ totalItem, totalSold });
+
+        })
     }
     finally {
         // await client.close();
